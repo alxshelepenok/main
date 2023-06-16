@@ -1,0 +1,31 @@
+{
+  "title": "Alexander Shelepenok",
+  "description": "Software Engineer, Researcher [FE, AI, Data Science, Blockchain, Open Source, etc.]",
+  "technologies": "javascript, typescript, golang, rust, python, matlab, c, asm.",
+  "keywords": "shelepenok, software, js, rust, go, python",
+  "canonical": "https://alxshelepenok.com",
+  "email": "axlshelepenok@gmail.com",
+  "yandex_metrica": "93999803",
+  "links": [
+    {
+      "title": "Github",
+      "href": "https://github.com/alxshelepenok"
+    },
+    {
+      "title": "Telegram",
+      "href": "https://t.me/alxshelepenok"
+    },
+    {
+      "title": "Twitter",
+      "href": "https://twitter.com/alxshelepenok"
+    },
+    {
+      "title": "Linkedin",
+      "href": "https://www.linkedin.com/in/alxshelepenok"
+    },
+    {
+      "title": "Instagram",
+      "href": "https://www.instagram.com/alxshelepenok"
+    }
+  ]
+}

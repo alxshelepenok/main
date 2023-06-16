@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ title }}</title>
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="language" content="English">
+    <meta name="author" content="{{ title }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="canonical" href="{{ canonical }}" />
+    <style>{{ style }}</style>
+  </head>
+  <body>
+    <main>
+      <div class="wrapper">
+        <div class="bio">
+          <h1>{{ title }}</h1>
+          <p>{{ description }}</p>
+          <p>Experience: {{ technologies }}</p>
+        </div>
+        <div class="contact">
+          <button>Decrypt contact</button>
+          <span>: </span>
+          <span id="email">{{ email }}</span>
+        </div>
+        <ul class="links">
+          {%- for link in links %}
+          <li><a target="_blank" href="{{ link.href }}">{{ link.title | spaceless }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </main>
+    <script type="text/javascript">{{ script }}</script>
+    <script type="text/javascript">
+      <!-- Yandex.Metrika counter -->
+      <script type="text/javascript" >
+         (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+         m[i].l=1*new Date();
+         for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+         k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+         (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+         ym({{ yandex_metrica }}, "init", {
+              clickmap:true,
+              trackLinks:true,
+              accurateTrackBounce:true
+         });
+      </script>
+      <noscript><div><img src="https://mc.yandex.ru/watch/{{ yandex_metrica }}" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+      <!-- /Yandex.Metrika counter -->
+    </script>
+  </body>
+</html>
