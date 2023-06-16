@@ -1,0 +1,103 @@
+{
+  "person": {
+    "name": "Alex Shelepenok",
+    "email": "alxshelepenok@gmail.com",
+    "description": "Independent product engineer and security researcher. Creator of the Grove protocol for AI agents and humans.",
+    "links": [
+      {
+        "title": "Github",
+        "href": "https://github.com/alxshelepenok"
+      },
+      {
+        "title": "Linkedin",
+        "href": "https://www.linkedin.com/in/alxshelepenok"
+      },
+      {
+        "title": "Telegram",
+        "href": "https://t.me/alxshelepenok"
+      },
+      {
+        "title": "Instagram",
+        "href": "https://www.instagram.com/alxshelepenok"
+      },
+      {
+        "title": "Twitter (X)",
+        "href": "https://x.com/alxshelepenok"
+      }
+    ],
+    "skills": [
+      {
+        "name": "Agentic workflows",
+        "description": "Design and development of autonomous agent systems and LLM-driven execution flows."
+      },
+      {
+        "name": "Ontologies",
+        "description": "Creating semantic data models and structural representations of knowledge."
+      },
+      {
+        "name": "Graphs",
+        "description": "Graph theory, network analysis, and graph databases."
+      },
+      {
+        "name": "Cryptography",
+        "description": "Algorithmic data encryption, secure protocols, and mathematical security primitives."
+      },
+      {
+        "name": "Cybersecurity",
+        "description": "Securing digital assets, vulnerability analysis, and network defense systems."
+      }
+    ]
+  },
+  "website": {
+    "lang": "en",
+    "audit": false,
+    "og_images": false,
+    "og_locale": "en_US",
+    "gtag": "G-WC9RXYRQ4K",
+    "canonical": "https://alxshelepenok.com",
+    "description": "Independent product engineer and security researcher. Creator of the Grove protocol for AI agents and humans.",
+    "note": "I write code from time to time. For collaboration or just to touch base, feel free to reach out via Telegram where we can exchange ideas or discuss potential projects.",
+    "labels": {
+      "home": "Home",
+      "blog": "Blog",
+      "tags": "Tags",
+      "links": "Links",
+      "recent": "Recent articles",
+      "articles": "Articles",
+      "toc": "On this page",
+      "toc_list": "Table of contents"
+    },
+    "tags": {
+      "ai": "AI",
+      "graphtheory": "Graph theory",
+      "programming": "Programming",
+      "themikadomethod": "The Mikado Method"
+    },
+    "titles": {
+      "home": "Alex Shelepenok",
+      "blog": "A blog by Alex Shelepenok",
+      "article": "{title}",
+      "tags": {
+        "all": "Articles grouped by tags",
+        "any": "Articles related to {tag}",
+        "ai": "Articles related to AI",
+        "graphtheory": "Articles related to graph theory",
+        "programming": "Articles related to programming",
+        "themikadomethod": "Articles related to The Mikado Method"
+      }
+    },
+    "descriptions": {
+      "home": "Independent product engineer and security researcher. Creator of the Grove protocol for AI agents and humans.",
+      "blog": "Independent product engineer and security researcher. Creator of the Grove protocol for AI agents and humans.",
+      "article": "{description}",
+      "tags": {
+        "all": "Explore all blog topics and articles grouped by tags: AI, graph theory and more.",
+        "any": "Explore articles and guides related to {tag} by Alex Shelepenok.",
+        "ai": "Alex Shelepenok writes about agents and language models: workflows, context management, and keeping projects coherent.",
+        "graphtheory": "Alex Shelepenok writes about graph theory, dependency graphs and ontologies.",
+        "programming": "Alex Shelepenok writes about software engineering, system architecture, clean code, and refactoring techniques.",
+        "themikadomethod": "Alex Shelepenok writes about The Mikado Method, a process for surfacing hard-to-see dependencies in software projects."
+      }
+    }
+  }
+}

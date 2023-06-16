@@ -1,0 +1,92 @@
+{% extends "base.hbs" %}
+
+{% block content %}
+<header class="header"><a href="{{ home_href }}">{{ name }}</a></header>
+<main id="page" tabindex="-1">
+  <div class="article-layout">
+    <article class="article" id="article" tabindex="-1" aria-labelledby="article-title">
+      <header class="article-header">
+        <nav class="breadcrumbs" id="breadcrumb" aria-label="Breadcrumb" tabindex="-1">
+          <ol>
+            <li><a href="{{ home_href }}">{{ labels.home }}</a></li>
+            <li><a href="{{ blog_href }}">{{ labels.blog }}</a></li>
+            <li aria-current="page">{{ article_title }}</li>
+          </ol>
+        </nav>
+        <h1 id="article-title">{{ article_title }}</h1>
+        <div class="article-meta">
+          <time id="date-published" datetime="{{ article_date_iso }}">{{ article_date_display }}</time>
+          <span class="article-meta-sep" aria-hidden="true">/</span>
+          <time datetime="PT{{ article_reading_time }}M">{{ article_reading_time }} min read</time>
+          {% if article_tags %}
+          <span class="article-meta-sep" aria-hidden="true">/</span>
+          <ul class="article-tags">
+            {% for tag in article_tags %}<li><a class="article-tag" href="{{ tag.href }}" rel="tag" title="{{ tag.display }}" aria-label="{{ tag.display }}">#{{ tag.name }}</a></li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </header>
+      {{ article_content }}
+    </article>
+    {% if article_toc %}
+    <nav class="article-toc" id="toc" aria-labelledby="toc-title" tabindex="-1">
+      <h2 id="toc-title">{{ labels.toc }}</h2>
+      <ul id="toc-list" aria-label="{{ labels.toc_list }}">
+        {% for item in article_toc %}
+        <li class="article-toc-level-{{ item.level }}"><a href="#{{ item.id }}" data-toc-id="{{ item.id }}">{{ item.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</main>
+<script>
+  (function () {
+    var links = document.querySelectorAll("[data-toc-id]");
+    if (links.length === 0) return;
+    var ignoreUntil = 0;
+
+    function setActive(id) {
+      links.forEach(function (a) {
+        var on = a.getAttribute("data-toc-id") === id;
+        a.classList.toggle("active", on);
+        if (on) a.setAttribute("aria-current", "true");
+        else a.removeAttribute("aria-current");
+      });
+    }
+
+    links.forEach(function (link) {
+      link.addEventListener("click", function () {
+        var id = link.getAttribute("data-toc-id");
+        if (id) {
+          ignoreUntil = Date.now() + 300;
+          setActive(id);
+        }
+      });
+    });
+
+    var ids = Array.prototype.map.call(links, function (a) {
+      return a.getAttribute("data-toc-id");
+    });
+
+    var observer = new IntersectionObserver(function (entries) {
+      if (Date.now() < ignoreUntil) return;
+      var visible = entries.filter(function (e) { return e.isIntersecting; });
+      if (visible.length === 0) return;
+      var top = visible.reduce(function (t, e) {
+        return e.boundingClientRect.top < t.boundingClientRect.top ? e : t;
+      });
+      setActive(top.target.id);
+    }, { rootMargin: "0px 0px -60% 0px", threshold: 0 });
+
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    var hash = window.location.hash.slice(1);
+    if (hash && ids.indexOf(hash) !== -1) setActive(hash);
+    else if (!document.querySelector("[data-toc-id].active")) setActive(ids[0]);
+  })();
+</script>
+{% endblock content %}

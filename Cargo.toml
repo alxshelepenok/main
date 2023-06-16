@@ -1,0 +1,17 @@
+[package]
+name = "main"
+version = "0.1.0"
+authors = ["Alexander Shelepenok <alxshelepenok@gmail.com>"]
+description = "Service infrastructure and content for the personal website."
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+tera = "1.19.0"
+serde_json = { version = "1.0.96", features = ["preserve_order"] }
+comrak = "0.54"
+toml = "0.8"
+serde = { version = "1", features = ["derive"] }
+merman = { version = "0.7", features = ["render"] }
+fontdue = "0.9"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }

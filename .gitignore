@@ -1,0 +1,9 @@
+# editors
+.vscode
+.idea
+
+# environment
+environment
+
+# build
+target

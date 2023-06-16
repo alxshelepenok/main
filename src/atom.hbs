@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{{ name }}</title>
+  <subtitle>{{ description }}</subtitle>
+  <link href="{{ canonical }}" />
+  <link rel="self" href="{{ canonical }}/atom.xml" />
+  <id>{{ canonical }}/</id>
+  <updated>{{ feed_updated }}</updated>
+  <author>
+    <name>{{ name }}</name>
+  </author>
+  {%- for entry in entries %}
+  <entry>
+    <title>{{ entry.title }}</title>
+    <link href="{{ entry.url }}" />
+    <id>{{ entry.id }}</id>
+    <published>{{ entry.published }}</published>
+    <updated>{{ entry.updated }}</updated>
+    <summary>{{ entry.summary }}</summary>
+  </entry>
+  {%- endfor %}
+</feed>

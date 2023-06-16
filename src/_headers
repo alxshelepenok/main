@@ -1,0 +1,15 @@
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; font-src 'self'; frame-ancestors 'self'; form-action 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Link: </llms.txt>; rel="describedby"; type="text/markdown"; title="Site index for LLMs", </sitemap-index.xml>; rel="sitemap"; type="application/xml"
+  Permissions-Policy: geolocation=(), camera=(), microphone=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-site
+
+/*.ico
+/*.png
+/*.svg
+  Cache-Control: public, max-age=3600, must-revalidate

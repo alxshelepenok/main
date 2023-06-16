@@ -1,0 +1,45 @@
+{% extends "base.hbs" %}
+
+
+{% block content %}
+<header class="header"><a href="{{ home_href }}">{{ name }}</a></header>
+<main id="page" tabindex="-1">
+  <section class="listing" aria-labelledby="tag-title">
+    <header class="listing-header">
+      <nav class="breadcrumbs" id="breadcrumb" aria-label="Breadcrumb" tabindex="-1">
+        <ol>
+          <li><a href="{{ home_href }}">{{ labels.home }}</a></li>
+          <li><a href="{{ blog_href }}">{{ labels.blog }}</a></li>
+          <li><a href="{{ tags_href }}">{{ labels.tags }}</a></li>
+          <li aria-current="page">{{ tag_name }}</li>
+        </ol>
+      </nav>
+      <hgroup>
+        <h1 id="tag-title">{{ tag_name }}</h1>
+        <p>{{ tag_count_label }}</p>
+      </hgroup>
+    </header>
+    <ul id="articles" aria-labelledby="tag-title">
+      {%- for card in cards %}
+      <li>
+        <article class="card" id="article-{{ card.slug }}" tabindex="-1">
+          <h2><a href="{{ card.href }}">{{ card.title }}</a></h2>
+          <p class="card-description">{{ card.description }}</p>
+          <div class="article-meta">
+            <time datetime="{{ card.date_iso }}">{{ card.date_display }}</time>
+            <span class="article-meta-sep" aria-hidden="true">/</span>
+            <time datetime="PT{{ card.reading_time }}M">{{ card.reading_time }} min read</time>
+            {% if card.tags %}
+            <span class="article-meta-sep" aria-hidden="true">/</span>
+            <ul class="article-tags">
+              {% for tag in card.tags %}<li><a class="article-tag" href="{{ tag.href }}" rel="tag" title="{{ tag.display }}" aria-label="{{ tag.display }}">#{{ tag.name }}</a></li>{% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </article>
+      </li>
+      {% endfor -%}
+    </ul>
+  </section>
+</main>
+{% endblock content %}
