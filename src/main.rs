@@ -4,14 +4,14 @@ extern crate lazy_static;
 extern crate serde_json;
 extern crate tera;
 
-use minify_html::{Cfg, minify};
-use base64::{Engine as _, engine::{general_purpose}};
+use base64::{engine::general_purpose, Engine as _};
+use minify_html::{minify, Cfg};
 use tera::{Context, Tera};
 
 use std::{
-    fs::{copy, File},
-    io::{prelude::*},
     error::Error,
+    fs::{copy, File},
+    io::prelude::*,
 };
 
 const INPUT_PATH: &str = "src";
@@ -76,15 +76,22 @@ fn main() {
     ctx.insert("links", &CONTENT["links"]);
     ctx.insert("technologies", &CONTENT["technologies"]);
 
-    let email_base64 = general_purpose::STANDARD.encode(CONTENT["email"].as_str().unwrap().as_bytes());
+    let email_base64 =
+        general_purpose::STANDARD.encode(CONTENT["email"].as_str().unwrap().as_bytes());
     ctx.insert("email", &email_base64);
 
     let mut script = String::new();
-    File::open(concat(INPUT_PATH, SCRIPT_FILE)).unwrap().read_to_string(&mut script).unwrap();
+    File::open(concat(INPUT_PATH, SCRIPT_FILE))
+        .unwrap()
+        .read_to_string(&mut script)
+        .unwrap();
     ctx.insert("script", &script);
 
     let mut style = String::new();
-    File::open(concat(INPUT_PATH, STYLE_FILE)).unwrap().read_to_string(&mut style).unwrap();
+    File::open(concat(INPUT_PATH, STYLE_FILE))
+        .unwrap()
+        .read_to_string(&mut style)
+        .unwrap();
     ctx.insert("style", &style);
 
     let render_error = |e: &tera::Error| {
@@ -104,13 +111,17 @@ fn main() {
 
     match TEMPLATES.render(INDEX_TEMPLATE_FILE, &ctx) {
         Ok(s) => render_write(&s, INDEX_OUTPUT_FILE),
-        Err(e) => render_error(&e)
+        Err(e) => render_error(&e),
     };
 
     match TEMPLATES.render(NOT_FOUND_TEMPLATE_FILE, &ctx) {
         Ok(s) => render_write(&s, NOT_FOUND_OUTPUT_FILE),
-        Err(e) => render_error(&e)
+        Err(e) => render_error(&e),
     };
 
-    copy(concat(INPUT_PATH, FAVICON_FILE), concat(OUTPUT_PATH, FAVICON_FILE)).unwrap();
+    copy(
+        concat(INPUT_PATH, FAVICON_FILE),
+        concat(OUTPUT_PATH, FAVICON_FILE),
+    )
+    .unwrap();
 }
