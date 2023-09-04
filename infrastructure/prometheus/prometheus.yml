@@ -1,0 +1,57 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+  external_labels:
+    monitor: dashboard
+
+remote_write:
+  - url: http://victoriametrics:8428/api/v1/write
+
+scrape_configs:
+  - job_name: nexus
+    scrape_interval: 60s
+    scrape_timeout: 30s
+    metrics_path: /service/metrics/prometheus
+    basic_auth:
+      username: prometheus
+      password: prometheus
+    static_configs:
+      - targets:
+          - nexus:8081
+
+  - job_name: prometheus
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+          - prometheus:9090
+
+  - job_name: containers
+    metric_relabel_configs:
+      - regex: "container_label_\
+          (url|version|vendor|description|\
+          vcs_type|vcs_ref|stop|run|maintainer|\
+          distribution_scope|summary|com_(sonatype|redhat)_.*|io_.*)"
+        action: labeldrop
+
+      - source_labels: [ __name__ ]
+        regex: (container_tasks_state|container_memory_failures_total)
+        action: drop
+
+      - source_labels: [ id ]
+        regex: /system.slice/var-lib-docker-containers.*-shm.mount
+        action: drop
+
+      - source_labels: [ image ]
+        regex: .*/(.*)
+        replacement: $1
+        target_label: id
+
+      - source_labels: [ service ]
+        regex: ecs-.*:ecs-([a-z]+-*[a-z]*).*:[0-9]+
+        replacement: $1
+        target_label: service
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - cadvisor:8080

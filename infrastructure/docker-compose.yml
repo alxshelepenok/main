@@ -1,0 +1,181 @@
+version: "3.9"
+
+services:
+  proxy:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/nginxproxy/nginx-proxy:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      TRUST_DOWNSTREAM_PROXY: "false"
+    volumes:
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx/client-max-body-size-off.conf:/etc/nginx/conf.d/client-max-body-size-off.conf:ro
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    networks:
+      default:
+        ipv4_address: 10.100.0.2
+
+  letsencrypt:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/nginxproxy/acme-companion:latest
+    restart: unless-stopped
+    volumes:
+      - acme:/etc/acme.sh
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      default:
+        ipv4_address: 10.100.0.3
+
+  nexus:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/alxshelepenok/nexus:latest
+    restart: unless-stopped
+    volumes:
+      - nexus-data:/nexus-data
+    environment:
+      - VIRTUAL_HOST=${NEXUS_HOST}
+      - VIRTUAL_PORT=${NEXUS_PORT}
+      - LETSENCRYPT_HOST=${NEXUS_HOST}
+      - LETSENCRYPT_EMAIL=${NEXUS_EMAIL}
+    networks:
+      default:
+        ipv4_address: 10.100.0.4
+
+  cadvisor:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/alxshelepenok/cadvisor:latest
+    restart: unless-stopped
+    privileged: true
+    command:
+      - --docker_only=true
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+      - /var/run:/var/run:ro
+      - /dev/disk/:/dev/disk:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      default:
+        ipv4_address: 10.100.0.5
+
+  prometheus:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/alxshelepenok/prometheus:latest
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=90d
+      - --storage.tsdb.retention.size=10GB
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+    depends_on:
+      - victoriametrics
+    networks:
+      default:
+        ipv4_address: 10.100.0.6
+
+  grafana:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/alxshelepenok/grafana:latest
+    restart: unless-stopped
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./plugins/provisioning/:/etc/grafana/plugins/
+    environment:
+      - VIRTUAL_HOST=${GRAFANA_HOST}
+      - VIRTUAL_PORT=${GRAFANA_PORT}
+      - LETSENCRYPT_HOST=${GRAFANA_HOST}
+      - LETSENCRYPT_EMAIL=${GRAFANA_EMAIL}
+    networks:
+      default:
+        ipv4_address: 10.100.0.7
+
+  victoriametrics:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/alxshelepenok/victoriametrics:latest
+    restart: unless-stopped
+    volumes:
+      - victoriametrics-data:/storage
+    command:
+      - --storageDataPath=/storage
+      - --selfScrapeInterval=10s
+    networks:
+      default:
+        ipv4_address: 10.100.0.8
+
+  nexus-docker-hosted:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/alxshelepenok/port-forward:latest
+    restart: unless-stopped
+    environment:
+      - REMOTE_HOST=${NEXUS_DOCKER_HOSTED_REMOTE_HOST}
+      - REMOTE_PORT=${NEXUS_DOCKER_HOSTED_REMOTE_PORT}
+      - VIRTUAL_HOST=${NEXUS_DOCKER_HOSTED_HOST}
+      - VIRTUAL_PORT=${NEXUS_DOCKER_HOSTED_PORT}
+      - LETSENCRYPT_HOST=${NEXUS_DOCKER_HOSTED_HOST}
+      - LETSENCRYPT_EMAIL=${NEXUS_DOCKER_HOSTED_EMAIL}
+    networks:
+      default:
+        ipv4_address: 10.100.0.9
+
+  nexus-docker-proxy:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/alxshelepenok/port-forward:latest
+    restart: unless-stopped
+    environment:
+      - REMOTE_HOST=${NEXUS_DOCKER_PROXY_REMOTE_HOST}
+      - REMOTE_PORT=${NEXUS_DOCKER_PROXY_REMOTE_PORT}
+      - VIRTUAL_HOST=${NEXUS_DOCKER_PROXY_HOST}
+      - VIRTUAL_PORT=${NEXUS_DOCKER_PROXY_PORT}
+      - LETSENCRYPT_HOST=${NEXUS_DOCKER_PROXY_HOST}
+      - LETSENCRYPT_EMAIL=${NEXUS_DOCKER_PROXY_EMAIL}
+    networks:
+      default:
+        ipv4_address: 10.100.0.10
+
+  nexus-docker-group:
+    image: docker-group.nexus.infrastructure.alxshelepenok.com/alxshelepenok/port-forward:latest
+    restart: unless-stopped
+    environment:
+      - REMOTE_HOST=${NEXUS_DOCKER_GROUP_REMOTE_HOST}
+      - REMOTE_PORT=${NEXUS_DOCKER_GROUP_REMOTE_PORT}
+      - VIRTUAL_HOST=${NEXUS_DOCKER_GROUP_HOST}
+      - VIRTUAL_PORT=${NEXUS_DOCKER_GROUP_PORT}
+      - LETSENCRYPT_HOST=${NEXUS_DOCKER_GROUP_HOST}
+      - LETSENCRYPT_EMAIL=${NEXUS_DOCKER_GROUP_EMAIL}
+    networks:
+      default:
+        ipv4_address: 10.100.0.11
+
+volumes:
+  victoriametrics-data:
+    external: false
+  prometheus-data:
+    external: false
+  grafana-data:
+    external: false
+  nexus-data:
+    external: false
+  acme:
+    external: false
+  certs:
+    external: false
+  vhost:
+    external: false
+  html:
+    external: false
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.100.0.0/16
+          gateway: 10.100.0.1
