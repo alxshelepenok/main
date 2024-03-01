@@ -169,6 +169,7 @@ main {
 
 .contact {
   height: 80px;
+  line-height: 22px;
   display: inline-block;
   word-break: break-all;
 }

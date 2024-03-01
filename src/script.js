@@ -1,237 +1,122 @@
-const randomNumber = (min, max) => {
- return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const randomNumber = (min, max) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 
-const splitWord = (word) => {
-  return [...word]
-    .map((letter) => {
-      return `<span class="char">${letter}</span>`;
-    })
-    .join("");
+const splitWord = (word) =>
+  [...word].map((letter) => `<span class="char">${letter}</span>`).join("");
+
+const characterIsSupported = (
+  character,
+  font = getComputedStyle(document.body).fontFamily,
+  recursion = false,
+) => {
+  const testCanvas = document.createElement("canvas");
+  const referenceCanvas = document.createElement("canvas");
+  testCanvas.width =
+    referenceCanvas.width =
+      testCanvas.height =
+        referenceCanvas.height =
+          150;
+
+  const testContext = testCanvas.getContext("2d");
+  const referenceContext = referenceCanvas.getContext("2d");
+  testContext.font = referenceContext.font = "100px " + font;
+  testContext.fillStyle = referenceContext.fillStyle = "black";
+  testContext.fillText(character, 0, 100);
+  referenceContext.fillText("\uffff", 0, 100);
+
+  if (!recursion && characterIsSupported("\ufffe", font, true)) {
+    testContext.fillStyle = referenceContext.fillStyle = "black";
+    testContext.fillRect(10, 10, 80, 80);
+    referenceContext.fillRect(10, 10, 80, 80);
+  }
+
+  return testCanvas.toDataURL() !== referenceCanvas.toDataURL();
 };
 
-class LinkedListNode {
-  value = null;
-  next = null;
-  previous = null;
-
-  constructor(value) {
-    this.value = value;
-  }
-}
-
-class LinkedList {
-  head = null;
-  tail = null;
-  length = 0;
-
-  constructor() {}
-
-  add(value) {
-    const node = new LinkedListNode(value);
-    if (this.head === null) {
-      this.head = node;
-      this.tail = node;
-    } else {
-      this.tail.next = node;
-      node.previous = this.tail;
-      this.tail = node;
-    }
-    ++this.length;
-    return node;
-  }
-
-  iterate(fn) {
-    let node = this.head;
-    let i = 0;
-    while (node !== null) {
-      fn(node, i);
-      node = node.next;
-      ++i;
-    }
-  }
-}
-
-class Cell {
-  DOM = { el: null };
-  position = -1;
-  previousCellPosition = -1;
-  original;
-  state;
-
-  constructor(el, { position, previousCellPosition } = {}) {
-    this.DOM.el = el;
-    this.original = this.DOM.el.innerHTML;
-    this.state = this.original;
-    this.position = position;
-    this.previousCellPosition = previousCellPosition;
-  }
-
+const createCell = (el, { position, previousCellPosition } = {}) => ({
+  DOM: { el },
+  original: el.innerHTML,
+  state: el.innerHTML,
+  position,
+  previousCellPosition,
   set(value) {
     this.state = value;
     this.DOM.el.innerHTML = this.state;
-  }
-}
+  },
+});
 
-class TypeShuffle {
-  DOM = {
-    el: null,
-  };
-  cells = [];
-  lettersAndSymbols = [
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "O",
-    "P",
-    "Q",
-    "R",
-    "S",
-    "T",
-    "U",
-    "V",
-    "W",
-    "X",
-    "Y",
-    "Z",
-    "!",
-    "@",
-    "#",
-    "$",
-    "&",
-    "*",
-    "(",
-    ")",
-    "-",
-    "_",
-    "+",
-    "=",
-    "/",
-    "[",
-    "]",
-    "{",
-    "}",
-    ";",
-    ":",
-    "<",
-    ">",
-    ",",
-    "0",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-  ];
-  effects = {
-    fx: () => this.fx(),
-  };
-  totalChars = 0;
+const initTypeShuffle = (el) => {
+  const cells = [];
+  let lettersAndSymbols = ["A", "B", ..."9"];
 
-  constructor(el) {
-    this.DOM.el = el;
-
-    let charCount = 0;
-    const list = new LinkedList();
-
-    [...window.atob(this.DOM.el.innerHTML).split(" ")].forEach((word) => {
-      const wordEl = document.createElement("span");
-      wordEl.className = "word";
-      wordEl.innerHTML = splitWord(word);
-      list.add(wordEl);
-    });
-
-    this.DOM.el.innerHTML = "";
-
-    list.iterate((node) => {
-      this.DOM.el.appendChild(node.value);
-      if (node.next !== null) {
-        this.DOM.el.appendChild(document.createTextNode(" "));
-      }
-      for (const char of [...node.value.querySelectorAll(".char")]) {
-        this.cells.push(
-          new Cell(char, {
-            position: charCount,
-            previousCellPosition: charCount === 0 ? -1 : charCount - 1,
-          })
-        );
-        ++charCount;
-      }
-    });
-
-    this.totalChars += charCount;
+  if (characterIsSupported("ラ")) {
+    lettersAndSymbols = lettersAndSymbols.concat(["ラ", "ド", ..."ウ"]);
   }
 
-  clearCells() {
-    for (const cell of this.cells) {
-      cell.set("&nbsp;");
-    }
-  }
+  const clearCells = () => cells.forEach((cell) => cell.set("&nbsp;"));
 
-  getRandomChar() {
-    return this.lettersAndSymbols[
-      Math.floor(Math.random() * this.lettersAndSymbols.length)
-      ];
-  }
+  const getRandomChar = () =>
+    lettersAndSymbols[Math.floor(Math.random() * lettersAndSymbols.length)];
 
-  fx() {
-    const MAX_CELL_ITERATIONS = 10;
+  const fx = () => {
+    const MAX_CELL_ITERATIONS = 7;
     let finished = 0;
-    this.clearCells();
+    clearCells();
 
     const loop = (cell, iteration = 0) => {
       if (iteration === MAX_CELL_ITERATIONS - 1) {
         cell.set(cell.original);
-        ++finished;
-        if (finished === this.totalChars) {
-          this.isAnimating = false;
-        }
+        finished++;
       } else {
-        cell.set(this.getRandomChar());
+        cell.set(getRandomChar());
       }
 
-      ++iteration;
+      iteration++;
       if (iteration < MAX_CELL_ITERATIONS) {
         setTimeout(() => loop(cell, iteration), 80);
       }
     };
 
-    for (const cell of this.cells) {
-      setTimeout(() => loop(cell), randomNumber(0, 1000));
-    }
-  }
+    cells.forEach((cell) =>
+      setTimeout(() => loop(cell), randomNumber(0, 1000)),
+    );
+  };
 
-  trigger(effect = "fx") {
-    if (!(effect in this.effects) || this.isAnimating) return;
-    this.isAnimating = true;
-    this.effects[effect]();
-  }
-}
+  const triggerEffect = () => {
+    const words = window.atob(el.innerHTML).split(" ");
+    el.innerHTML = "";
 
-const btn = document.querySelector(".contact > button");
+    words.forEach((word) => {
+      const wordEl = document.createElement("span");
+      wordEl.className = "word";
+      wordEl.innerHTML = splitWord(word);
+      el.appendChild(wordEl);
+      el.appendChild(document.createTextNode(" "));
 
-btn.addEventListener(
+      [...wordEl.querySelectorAll(".char")].forEach((charEl, index) => {
+        cells.push(
+          createCell(charEl, {
+            position: index,
+            previousCellPosition: index - 1,
+          }),
+        );
+      });
+    });
+
+    fx();
+  };
+
+  return { triggerEffect };
+};
+
+const shuffleElement = document.querySelector(".contact > #email");
+const typeShuffle = initTypeShuffle(shuffleElement);
+
+document.querySelector(".contact > button").addEventListener(
   "click",
   () => {
-    const el = document.querySelector(".contact > #email");
-    el.classList.add("decrypted");
-    const ts = new TypeShuffle(el);
-    ts.trigger("fx");
+    typeShuffle.triggerEffect();
+    shuffleElement.classList.add("decrypted");
   },
-  { once: true }
+  { once: true },
 );

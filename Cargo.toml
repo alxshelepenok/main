@@ -2,7 +2,7 @@
 name = "main"
 version = "0.1.0"
 authors = ["Alexander Shelepenok <alxshelepenok@gmail.com>"]
-description = "A simple static site generator"
+description = "Service infrastructure and content for the personal website"
 license = "MIT"
 edition = "2021"
 
@@ -11,4 +11,4 @@ tera = "1.19.0"
 lazy_static = "1.4.0"
 serde_json = "1.0.96"
 base64 = "0.21.2"
-minify-html = "0.11.1"
+minify-html = "0.15.0"

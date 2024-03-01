@@ -23,7 +23,7 @@ const NOT_FOUND_TEMPLATE_FILE: &str = "404.tmpl";
 const CONTENT_FILE: &str = "content.json";
 const TEMPLATE_PATH: &str = "src/**/*.tmpl";
 const STYLE_FILE: &str = "style.css";
-const SCRIPT_FILE: &str = "script.js";
+const SCRIPT_FILE: &str = "script.min.js";
 const FAVICON_FILE: &str = "favicon.png";
 
 fn concat(p: &str, f: &str) -> String {
@@ -48,7 +48,7 @@ lazy_static! {
     pub static ref MINIFIER_CFG: Cfg = {
         let mut cfg = Cfg::new();
         cfg.minify_css = true;
-        cfg.minify_js = true;
+        cfg.minify_js = false;
         cfg.do_not_minify_doctype = true;
         cfg.keep_spaces_between_attributes = true;
         cfg.ensure_spec_compliant_unquoted_attribute_values = true;
