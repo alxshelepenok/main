@@ -74,7 +74,6 @@ fn main() {
     ctx.insert("canonical", &CONTENT["canonical"]);
     ctx.insert("keywords", &CONTENT["keywords"]);
     ctx.insert("links", &CONTENT["links"]);
-    ctx.insert("technologies", &CONTENT["technologies"]);
 
     let email_base64 =
         general_purpose::STANDARD.encode(CONTENT["email"].as_str().unwrap().as_bytes());
