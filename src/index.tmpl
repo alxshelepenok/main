@@ -15,14 +15,9 @@
   <body>
     <main>
       <div class="wrapper">
-        <div class="bio">
+        <div class="description">
           <h1>{{ title }}</h1>
           <p>{{ description }}</p>
-        </div>
-        <div class="contact">
-          <button>Decrypt contact</button>
-          <span>: </span>
-          <span id="email">{{ email }}</span>
         </div>
         <ul class="links">
           {%- for link in links %}
@@ -31,7 +26,6 @@
         </ul>
       </div>
     </main>
-    <script type="text/javascript">{{ script }}</script>
     <script type="text/javascript">
        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
        m[i].l=1*new Date();

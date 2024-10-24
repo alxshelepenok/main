@@ -1,3 +1,10 @@
+:root {
+  --color-dark: 240 7% 11%;
+  --color-gray: 240 6% 46.1%;
+  --color-primary: 338 90% 47%;
+  --color-light-gray: 240 6% 89.1%;
+}
+
 html, body {
   padding: 0;
   margin: 0;
@@ -119,7 +126,7 @@ summary {
 }
 
 a {
-  color: hsl(338deg 90% 47%);
+  color: hsl(var(--color-primary));
   text-decoration: none;
   background-color: transparent;
 }
@@ -138,7 +145,7 @@ main {
 
 .wrapper {
   width: 100%;
-  max-width: 650px;
+  max-width: 420px;
   margin: 0 auto;
   padding: 30px;
   overflow: hidden;
@@ -148,56 +155,24 @@ main {
   text-align: center;
 }
 
-.bio {
+.description {
   width: 100%;
   display: block;
-  margin: 0 auto 15px;
-  max-width: 650px;
+  margin: 0 auto 40px;
+  max-width: 420px;
   text-align: left;
 }
 
-.bio > h1 {
-  font-size: 1.85em;
+.description > h1 {
+  font-size: 1.8rem;
   margin: 0;
 }
 
-.bio > p {
+.description > p {
   margin: 15px 0;
+  line-height: 1.4rem;
   word-break: break-word;
   white-space: break-spaces;
-}
-
-.contact {
-  height: 80px;
-  line-height: 22px;
-  display: inline-block;
-  word-break: break-all;
-}
-
-.contact > #email {
-  padding: 0 5px;
-  border-radius: 3px;
-  background: hsl(338deg 90% 47% / 5%);
-}
-
-.contact > #email.decrypted {
-  padding: 0;
-  background: none;
-}
-
-.contact > button {
-  border: none;
-  padding: 0;
-  text-align: left;
-  appearance: none;
-  white-space: nowrap;
-  background-color: transparent;
-  color: hsl(0deg 0% 0%);
-  cursor: pointer;
-}
-
-.contact > button:hover {
-  border-bottom: 1px solid hsl(0deg 0% 0%);
 }
 
 .links {
@@ -209,10 +184,10 @@ main {
 }
 
 .links > li {
-  font-size: 1.2em;
+  font-size: 1.15rem;
   text-align: left;
   list-style: none;
   margin: 0 0 20px;
   padding-bottom: 15px;
-  border-bottom: 1px dashed hsl(0deg 0% 0% / 10%);
+  border-bottom: 1px dashed hsl(var(--color-light-gray));
 }

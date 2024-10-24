@@ -23,7 +23,6 @@ const NOT_FOUND_TEMPLATE_FILE: &str = "404.tmpl";
 const CONTENT_FILE: &str = "content.json";
 const TEMPLATE_PATH: &str = "src/**/*.tmpl";
 const STYLE_FILE: &str = "style.css";
-const SCRIPT_FILE: &str = "script.min.js";
 const FAVICON_FILE: &str = "favicon.png";
 
 fn concat(p: &str, f: &str) -> String {
@@ -78,13 +77,6 @@ fn main() {
     let email_base64 =
         general_purpose::STANDARD.encode(CONTENT["email"].as_str().unwrap().as_bytes());
     ctx.insert("email", &email_base64);
-
-    let mut script = String::new();
-    File::open(concat(INPUT_PATH, SCRIPT_FILE))
-        .unwrap()
-        .read_to_string(&mut script)
-        .unwrap();
-    ctx.insert("script", &script);
 
     let mut style = String::new();
     File::open(concat(INPUT_PATH, STYLE_FILE))
