@@ -23,7 +23,15 @@ const NOT_FOUND_TEMPLATE_FILE: &str = "404.tmpl";
 const CONTENT_FILE: &str = "content.json";
 const TEMPLATE_PATH: &str = "src/**/*.tmpl";
 const STYLE_FILE: &str = "style.css";
-const FAVICON_FILE: &str = "favicon.png";
+const COPY_FILES: [&str; 7] = [
+    "main.webmanifest",
+    "apple-touch-icon.png",
+    "favicon.ico",
+    "favicon.svg",
+    "favicon-96x96.png",
+    "web-app-manifest-192x192.png",
+    "web-app-manifest-512x512.png",
+];
 
 fn concat(p: &str, f: &str) -> String {
     [p, f].join("/")
@@ -110,9 +118,7 @@ fn main() {
         Err(e) => render_error(&e),
     };
 
-    copy(
-        concat(INPUT_PATH, FAVICON_FILE),
-        concat(OUTPUT_PATH, FAVICON_FILE),
-    )
-    .unwrap();
+    for f in COPY_FILES.iter() {
+        copy(concat(INPUT_PATH, f), concat(OUTPUT_PATH, f)).unwrap();
+    }
 }
