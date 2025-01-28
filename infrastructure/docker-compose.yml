@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   proxy:
     image: docker-group.nexus.infrastructure.alxshelepenok.com/nginxproxy/nginx-proxy:alpine
