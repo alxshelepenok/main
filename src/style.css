@@ -1,8 +1,7 @@
 :root {
   --color-dark: 240 7% 11%;
   --color-gray: 240 6% 46.1%;
-  --color-primary: 353, 82%, 63%;
-  --color-light-gray: 240 6% 89.1%;
+  --color-primary: 342, 100%, 47%;
 }
 
 html, body {
@@ -189,5 +188,5 @@ main {
   list-style: none;
   margin: 0 0 20px;
   padding-bottom: 15px;
-  border-bottom: 1px dashed hsl(var(--color-light-gray));
+  border-bottom: 1px dashed hsl(var(--color-gray) / 0.2);
 }
