@@ -24,6 +24,7 @@ const CONTENT_FILE: &str = "content.json";
 const TEMPLATE_PATH: &str = "src/**/*.tmpl";
 const STYLE_FILE: &str = "style.css";
 const COPY_FILES: [&str; 7] = [
+    "cv.pdf",
     "main.webmanifest",
     "apple-touch-icon.png",
     "favicon.ico",
