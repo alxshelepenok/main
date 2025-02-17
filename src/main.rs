@@ -23,7 +23,7 @@ const NOT_FOUND_TEMPLATE_FILE: &str = "404.tmpl";
 const CONTENT_FILE: &str = "content.json";
 const TEMPLATE_PATH: &str = "src/**/*.tmpl";
 const STYLE_FILE: &str = "style.css";
-const COPY_FILES: [&str; 7] = [
+const COPY_FILES: [&str; 8] = [
     "cv.pdf",
     "main.webmanifest",
     "apple-touch-icon.png",
