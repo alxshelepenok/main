@@ -807,14 +807,17 @@ a.article-tag:hover {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .links > a {
+  .links a {
     font-size: var(--font-size-md);
+  }
+
+  .links > h2 {
+    margin-bottom: 1rem;
   }
 
   .links > ul > li {
     font-size: var(--font-size-md);
     margin-bottom: 0.75rem;
-    padding-bottom: 1rem;
   }
 
   .footer-links {
