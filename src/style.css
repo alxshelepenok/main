@@ -131,7 +131,9 @@ main {
   flex: 1;
 }
 
-section:focus {
+section:focus,
+article:focus,
+article:focus-visible {
   outline: 0;
 }
 
