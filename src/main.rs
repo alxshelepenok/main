@@ -2,9 +2,10 @@ use std::{
     error::Error,
     fs,
     path::{Path, PathBuf},
-    sync::LazyLock,
+    sync::{LazyLock, Mutex},
 };
 
+mod archive;
 mod markdown;
 mod mermaid;
 mod og;
@@ -14,8 +15,8 @@ mod schema;
 
 use tera::{Context, Tera};
 
-const INPUT_PATH: &str = "src";
-const OUTPUT_PATH: &str = "target";
+pub(crate) const INPUT_PATH: &str = "src";
+pub(crate) const OUTPUT_PATH: &str = "target";
 const INDEX_OUTPUT_FILE: &str = "index.html";
 const INDEX_TEMPLATE_FILE: &str = "index.hbs";
 const NOT_FOUND_OUTPUT_FILE: &str = "404.html";
@@ -55,6 +56,16 @@ pub(crate) fn output_path(f: &str) -> PathBuf {
     Path::new(OUTPUT_PATH).join(f)
 }
 
+static OUTPUT_FILES: LazyLock<Mutex<Vec<PathBuf>>> =
+    LazyLock::new(|| Mutex::new(Vec::new()));
+
+fn record_output(path: &Path) {
+    OUTPUT_FILES
+        .lock()
+        .expect("the output file registry is poisoned")
+        .push(path.to_path_buf());
+}
+
 fn audit_enabled(content: &serde_json::Value) -> bool {
     matches!(content["website"]["audit"], serde_json::Value::Bool(true))
 }
@@ -70,8 +81,10 @@ fn write_audit_scripts() -> Result<(), Box<dyn Error>> {
     }
     fs::create_dir_all(&dir).map_err(|_| "failed to create the audit output".to_string())?;
     for file in ["schema-audit.js", "accessibility-tree-audit.js"] {
-        fs::copy(input_path(&format!("audit/{file}")), dir.join(file))
+        let out = dir.join(file);
+        fs::copy(input_path(&format!("audit/{file}")), &out)
             .map_err(|_| format!("failed to copy the audit script {file}").to_string())?;
+        record_output(&out);
     }
     Ok(())
 }
@@ -257,6 +270,7 @@ pub(crate) fn render_page(
             .map_err(|e| format!("failed to create directory for {out_file}: {e}"))?;
     }
     fs::write(&out, minified).map_err(|e| format!("failed to write {out_file}: {e}"))?;
+    record_output(&out);
     Ok(())
 }
 
@@ -266,8 +280,11 @@ fn render_unminified(template: &str, ctx: &Context, out_file: &str) -> Result<()
         format!("failed to render template {template} for {out_file}")
     })?;
 
-    fs::write(output_path(out_file), rendered)
-        .map_err(|e| format!("failed to write {out_file}: {e}").into())
+    let out = output_path(out_file);
+    fs::write(&out, rendered)
+        .map_err(|e| format!("failed to write {out_file}: {e}"))?;
+    record_output(&out);
+    Ok(())
 }
 
 fn read_style() -> Result<String, Box<dyn Error>> {
@@ -635,15 +652,21 @@ fn write_llms_files(
         })
         .collect();
 
-    fs::write(output_path("llms.txt"), llms_index(&CONTENT, &article_links, &tag_links))
+    let llms = output_path("llms.txt");
+    fs::write(&llms, llms_index(&CONTENT, &article_links, &tag_links))
         .map_err(|_| "failed to write llms.txt".to_string())?;
-    fs::write(output_path("llms-full.txt"), llms_full(&CONTENT, &pages))
+    record_output(&llms);
+    let llms_full_out = output_path("llms-full.txt");
+    fs::write(&llms_full_out, llms_full(&CONTENT, &pages))
         .map_err(|_| "failed to write llms-full.txt".to_string())?;
+    record_output(&llms_full_out);
 
     for article in articles {
-        fs::write(output_path(&format!("blog/{}.md", article.slug)), &article.body).map_err(|_| {
+        let out = output_path(&format!("blog/{}.md", article.slug));
+        fs::write(&out, &article.body).map_err(|_| {
             format!("failed to write the markdown source of article {}", article.slug).to_string()
         })?;
+        record_output(&out);
     }
     Ok(())
 }
@@ -768,8 +791,9 @@ fn build_atom_context(articles: &[articles::Article]) -> Result<Context, Box<dyn
 
 fn copy_static_files() -> Result<(), Box<dyn Error>> {
     for f in COPY_FILES {
-        fs::copy(input_path(f), output_path(f))
-            .map_err(|e| format!("failed to copy {f}: {e}"))?;
+        let out = output_path(f);
+        fs::copy(input_path(f), &out).map_err(|e| format!("failed to copy {f}: {e}"))?;
+        record_output(&out);
     }
     Ok(())
 }
@@ -786,8 +810,10 @@ fn write_diagrams(article: &articles::Article) -> Result<(), Box<dyn Error>> {
     fs::create_dir_all(&dir)
         .map_err(|e| format!("failed to create diagrams dir for {}: {e}", article.slug))?;
     for diagram in &article.diagrams {
-        fs::write(dir.join(&diagram.file_name), &diagram.svg)
+        let out = dir.join(&diagram.file_name);
+        fs::write(&out, &diagram.svg)
             .map_err(|e| format!("failed to write {}: {e}", diagram.file_name))?;
+        record_output(&out);
     }
     Ok(())
 }
@@ -863,6 +889,12 @@ fn main() -> Result<(), Box<dyn Error>> {
         audit_output("/blog/tags/", TAGS_INDEX_OUTPUT_FILE)?;
     }
 
+    let output_files = OUTPUT_FILES
+        .lock()
+        .expect("the output file registry is poisoned")
+        .clone();
+    archive::write_site_zip(&output_files)?;
+
     Ok(())
 }
 
@@ -902,15 +934,19 @@ fn write_og_images(articles: &[articles::Article]) -> Result<(), Box<dyn Error>>
             site_line,
             &out,
         )?;
+        record_output(&out);
     }
 
+    let root_og = output_path("og.jpg");
     og::render(
         &bg,
         website()["titles"]["home"].as_str().unwrap_or(""),
         website()["descriptions"]["home"].as_str().unwrap_or(""),
         site_line,
-        &output_path("og.jpg"),
-    )
+        &root_og,
+    )?;
+    record_output(&root_og);
+    Ok(())
 }
 
 fn sitemap_url(loc: &str, lastmod: Option<&str>) -> String {
@@ -980,10 +1016,14 @@ fn write_sitemaps(
         sitemap_index_entry(&format!("{canonical}/sitemap-0.xml"))
     );
 
-    fs::write(output_path("sitemap-0.xml"), sitemap_document(&urls))
+    let sitemap = output_path("sitemap-0.xml");
+    fs::write(&sitemap, sitemap_document(&urls))
         .map_err(|e| format!("failed to write sitemap-0.xml: {e}"))?;
-    fs::write(output_path("sitemap-index.xml"), index)
+    record_output(&sitemap);
+    let sitemap_index = output_path("sitemap-index.xml");
+    fs::write(&sitemap_index, index)
         .map_err(|e| format!("failed to write sitemap-index.xml: {e}"))?;
+    record_output(&sitemap_index);
 
     Ok(())
 }
