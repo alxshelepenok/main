@@ -1,4 +1,4 @@
-use std::{error::Error, fs, path::Path, time::{SystemTime, UNIX_EPOCH}};
+use std::{error::Error, fs, path::Path};
 
 use serde::Deserialize;
 use toml::value::Datetime;
@@ -12,11 +12,12 @@ const MONTHS: [&str; 12] = [
 ];
 
 #[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct FrontMatter {
     pub title: String,
     pub description: String,
-    pub date: Datetime,
+    pub date_published: Datetime,
+    pub date_modified: Datetime,
     pub tags: Option<Vec<String>>,
     pub lang: Option<String>,
     pub draft: Option<bool>,
@@ -47,19 +48,19 @@ impl Article {
     }
 
     pub fn date_display(&self) -> String {
-        format_date(&self.frontmatter.date)
+        format_date(&self.frontmatter.date_published)
     }
 
     pub fn date_iso(&self) -> String {
-        iso_date(&self.frontmatter.date)
+        iso_date(&self.frontmatter.date_published)
     }
 
     pub fn date_atom(&self) -> String {
-        utc_rfc3339(&self.frontmatter.date)
+        utc_rfc3339(&self.frontmatter.date_published)
     }
 
     fn sort_key(&self) -> (u16, u8, u8) {
-        date_parts(&self.frontmatter.date)
+        date_parts(&self.frontmatter.date_published)
     }
 }
 
@@ -105,12 +106,11 @@ pub fn collect_articles(dir: &Path) -> Result<Vec<Article>, Box<dyn Error>> {
         let frontmatter: FrontMatter = toml::from_str(frontmatter_source)
             .map_err(|e| format!("failed to parse frontmatter of article {slug}: {e}"))?;
 
-        if frontmatter.date.date.is_none()
-            || frontmatter.date.time.is_none()
-            || frontmatter.date.offset.is_none()
+        if !is_offset_datetime(&frontmatter.date_published)
+            || !is_offset_datetime(&frontmatter.date_modified)
         {
             return Err(format!(
-                "article {slug}: date must be an offset date-time like 2026-09-04T08:00:00+03:00"
+                "article {slug}: datePublished and dateModified must be offset date-times like 2026-09-04T08:00:00+03:00"
             ).into());
         }
 
@@ -122,19 +122,15 @@ pub fn collect_articles(dir: &Path) -> Result<Vec<Article>, Box<dyn Error>> {
             .map_err(|e| format!("failed to render article {slug}: {e}"))?;
 
         let words = body.split_whitespace().count();
-        let modified_atom = fs::metadata(&path)
-            .and_then(|m| m.modified())
-            .map(rfc3339_utc)
-            .unwrap_or_default();
         articles.push(Article {
             slug,
+            modified_atom: utc_rfc3339(&frontmatter.date_modified),
             frontmatter,
             body: body.trim().to_owned(),
             html: rendered.html,
             toc: rendered.toc,
             diagrams: rendered.diagrams,
             reading_time: reading_time(words),
-            modified_atom,
         });
     }
 
@@ -239,6 +235,10 @@ fn format_utc_secs(secs: i64) -> String {
     )
 }
 
+fn is_offset_datetime(datetime: &Datetime) -> bool {
+    datetime.date.is_some() && datetime.time.is_some() && datetime.offset.is_some()
+}
+
 fn utc_rfc3339(datetime: &Datetime) -> String {
     let date = datetime.date.expect("validated calendar date");
     let time = datetime.time.expect("validated clock time");
@@ -255,19 +255,11 @@ fn utc_rfc3339(datetime: &Datetime) -> String {
     format_utc_secs(secs)
 }
 
-fn rfc3339_utc(time: SystemTime) -> String {
-    let secs = match time.duration_since(UNIX_EPOCH) {
-        Ok(d) => d.as_secs() as i64,
-        Err(e) => -(e.duration().as_secs() as i64),
-    };
-    format_utc_secs(secs)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const SAMPLE: &str = "+++\ntitle = \"Hello\"\ndescription = \"First article.\"\ndate = 2026-09-04T08:00:00+03:00\ntags = [\"rust\"]\n+++\n\nBody text.\n";
+    const SAMPLE: &str = "+++\ntitle = \"Hello\"\ndescription = \"First article.\"\ndatePublished = 2026-09-04T08:00:00+03:00\ndateModified = 2026-09-05T09:30:00+03:00\ntags = [\"rust\"]\n+++\n\nBody text.\n";
 
     #[test]
     fn splits_front_matter_from_body() {
@@ -302,7 +294,7 @@ mod tests {
 
     #[test]
     fn unknown_front_matter_field_is_rejected() {
-        let raw = "+++\ntitle = \"x\"\ndescription = \"y\"\ndate = 2026-09-04T08:00:00+03:00\nsurprise = 1\n+++\n";
+        let raw = "+++\ntitle = \"x\"\ndescription = \"y\"\ndatePublished = 2026-09-04T08:00:00+03:00\ndateModified = 2026-09-04T09:00:00+03:00\nsurprise = 1\n+++\n";
         let (source, _) = split_front_matter(raw).unwrap();
         assert!(toml::from_str::<FrontMatter>(source).is_err());
     }
@@ -317,33 +309,33 @@ mod tests {
     #[test]
     fn formats_display_and_iso_dates() {
         let fm: FrontMatter = toml::from_str(
-            "title = \"x\"\ndescription = \"y\"\ndate = 2026-09-04T08:00:00+03:00",
+            "title = \"x\"\ndescription = \"y\"\ndatePublished = 2026-09-04T08:00:00+03:00\ndateModified = 2026-09-05T09:30:00+03:00",
         )
         .unwrap();
-        assert_eq!(format_date(&fm.date), "Sep 4, 2026");
-        assert_eq!(iso_date(&fm.date), "2026-09-04");
-        assert_eq!(fm.date.to_string(), "2026-09-04T08:00:00+03:00");
+        assert_eq!(format_date(&fm.date_published), "Sep 4, 2026");
+        assert_eq!(iso_date(&fm.date_published), "2026-09-04");
+        assert_eq!(fm.date_published.to_string(), "2026-09-04T08:00:00+03:00");
     }
 
     #[test]
     fn utc_rfc3339_normalizes_offsets_to_utc() {
         let plus3 = toml::from_str::<FrontMatter>(
-            "title = \"x\"\ndescription = \"y\"\ndate = 2026-09-04T00:00:00+03:00",
+            "title = \"x\"\ndescription = \"y\"\ndatePublished = 2026-09-04T00:00:00+03:00\ndateModified = 2026-09-04T01:00:00+03:00",
         )
         .unwrap();
-        assert_eq!(utc_rfc3339(&plus3.date), "2026-09-03T21:00:00Z");
+        assert_eq!(utc_rfc3339(&plus3.date_published), "2026-09-03T21:00:00Z");
 
         let utc = toml::from_str::<FrontMatter>(
-            "title = \"x\"\ndescription = \"y\"\ndate = 2026-09-04T08:00:00Z",
+            "title = \"x\"\ndescription = \"y\"\ndatePublished = 2026-09-04T08:00:00Z\ndateModified = 2026-09-04T09:00:00Z",
         )
         .unwrap();
-        assert_eq!(utc_rfc3339(&utc.date), "2026-09-04T08:00:00Z");
+        assert_eq!(utc_rfc3339(&utc.date_published), "2026-09-04T08:00:00Z");
 
         let minus8 = toml::from_str::<FrontMatter>(
-            "title = \"x\"\ndescription = \"y\"\ndate = 2026-09-04T23:30:00-08:00",
+            "title = \"x\"\ndescription = \"y\"\ndatePublished = 2026-09-04T23:30:00-08:00\ndateModified = 2026-09-05T00:30:00-08:00",
         )
         .unwrap();
-        assert_eq!(utc_rfc3339(&minus8.date), "2026-09-05T07:30:00Z");
+        assert_eq!(utc_rfc3339(&minus8.date_published), "2026-09-05T07:30:00Z");
     }
 
     #[test]
@@ -358,13 +350,16 @@ mod tests {
     fn date_only_or_naive_datetimes_are_rejected() {
         let dir = std::env::temp_dir().join("main-tests-articles-dates");
         fs::create_dir_all(&dir).unwrap();
-        for (name, date) in [
-            ("date_only.md", "2026-09-04"),
-            ("naive.md", "2026-09-04T08:00:00"),
+        let valid_modified = "dateModified = 2026-09-04T09:00:00+03:00";
+        let valid_published = "datePublished = 2026-09-04T08:00:00+03:00";
+        for (name, frontmatter) in [
+            ("date_only.md", format!("datePublished = 2026-09-04\n{valid_modified}")),
+            ("naive.md", format!("{valid_published}\ndateModified = 2026-09-04T09:00:00")),
+            ("naive_modified.md", format!("{valid_published}\ndateModified = 2026-09-04T09:00:00")),
         ] {
             fs::write(
                 dir.join(name),
-                format!("+++\ntitle = \"{name}\"\ndescription = \"d\"\ndate = {date}\n+++\n\nBody."),
+                format!("+++\ntitle = \"{name}\"\ndescription = \"d\"\n{frontmatter}\n+++\n\nBody."),
             )
             .unwrap();
         }
@@ -372,20 +367,7 @@ mod tests {
             Err(e) => e.to_string(),
             Ok(_) => panic!("date-only and naive datetimes must be rejected"),
         };
-        assert!(err.contains("date must be an offset date-time"), "{err}");
-    }
-
-    #[test]
-    fn rfc3339_utc_converts_epoch_seconds() {
-        assert_eq!(rfc3339_utc(UNIX_EPOCH), "1970-01-01T00:00:00Z");
-        assert_eq!(
-            rfc3339_utc(UNIX_EPOCH + std::time::Duration::from_secs(1_725_436_800)),
-            "2024-09-04T08:00:00Z"
-        );
-        assert_eq!(
-            rfc3339_utc(SystemTime::UNIX_EPOCH - std::time::Duration::from_secs(1)),
-            "1969-12-31T23:59:59Z"
-        );
+        assert!(err.contains("must be offset date-times"), "{err}");
     }
 
     #[test]
@@ -414,13 +396,13 @@ mod tests {
         ] {
             fs::write(
                 dir.join(name),
-                format!("+++\ntitle = \"{name}\"\ndescription = \"d\"\ndate = {date}\n+++\n\nBody."),
+                format!("+++\ntitle = \"{name}\"\ndescription = \"d\"\ndatePublished = {date}\ndateModified = {date}\n+++\n\nBody."),
             )
             .unwrap();
         }
         fs::write(
             dir.join("draft.md"),
-            "+++\ntitle = \"d\"\ndescription = \"d\"\ndate = 2026-07-01T00:00:00+03:00\ndraft = true\n+++\n\nBody.",
+            "+++\ntitle = \"d\"\ndescription = \"d\"\ndatePublished = 2026-07-01T00:00:00+03:00\ndateModified = 2026-07-01T00:00:00+03:00\ndraft = true\n+++\n\nBody.",
         )
         .unwrap();
 

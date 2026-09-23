@@ -1,7 +1,8 @@
 +++
 title = "Your project has a light cone"
 description = "Before anyone, human or agent, touches a line of code, you can compute exactly what must exist first and what will feel the change. The math is a century old."
-date = 2026-09-04T18:00:00+03:00
+datePublished = 2026-09-04T18:00:00+03:00
+dateModified = 2026-09-10T04:33:20+03:00
 tags = ["ai", "graphtheory", "programming", "themikadomethod"]
 +++
 

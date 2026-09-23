@@ -281,7 +281,7 @@ pub fn article_graph(content: &Value, article: &Article) -> Value {
                 {
                     "@type": "ListItem",
                     "position": 1,
-                    "item": { "@type": "WebPage", "@id": canonical, "url": canonical, "name": label(content, "home") }
+                    "item": { "@type": "WebPage", "@id": root_id(canonical, crate::routes::SLICE_PAGE), "url": root_id(canonical, crate::routes::SLICE_PAGE), "name": label(content, "home") }
                 },
                 {
                     "@type": "ListItem",
@@ -384,7 +384,7 @@ pub fn blog_index_graph(content: &Value, articles: &[Article], description: &str
                     {
                         "@type": "ListItem",
                         "position": 1,
-                        "item": { "@type": "WebPage", "@id": canonical, "url": canonical, "name": label(content, "home") }
+                        "item": { "@type": "WebPage", "@id": root_id(canonical, crate::routes::SLICE_PAGE), "url": root_id(canonical, crate::routes::SLICE_PAGE), "name": label(content, "home") }
                     },
                     {
                         "@type": "ListItem",
@@ -459,7 +459,7 @@ pub fn tag_graph(content: &Value, tag: &str, slug: &str, tagged: &[&Article], de
                     {
                         "@type": "ListItem",
                         "position": 1,
-                        "item": { "@type": "WebPage", "@id": canonical, "url": canonical, "name": label(content, "home") }
+                        "item": { "@type": "WebPage", "@id": root_id(canonical, crate::routes::SLICE_PAGE), "url": root_id(canonical, crate::routes::SLICE_PAGE), "name": label(content, "home") }
                     },
                     {
                         "@type": "ListItem",
@@ -476,8 +476,8 @@ pub fn tag_graph(content: &Value, tag: &str, slug: &str, tagged: &[&Article], de
                         "position": 3,
                         "item": {
                             "@type": "WebPage",
-                            "@id": format!("{canonical}/blog/tags/"),
-                            "url": format!("{canonical}/blog/tags/"),
+                            "@id": crate::routes::Route::tags_hub().id(canonical, crate::routes::SLICE_PAGE),
+                            "url": crate::routes::Route::tags_hub().id(canonical, crate::routes::SLICE_PAGE),
                             "name": label(content, "tags")
                         }
                     },
@@ -556,7 +556,7 @@ pub fn tags_index_graph(
                     {
                         "@type": "ListItem",
                         "position": 1,
-                        "item": { "@type": "WebPage", "@id": canonical, "url": canonical, "name": label(content, "home") }
+                        "item": { "@type": "WebPage", "@id": root_id(canonical, crate::routes::SLICE_PAGE), "url": root_id(canonical, crate::routes::SLICE_PAGE), "name": label(content, "home") }
                     },
                     {
                         "@type": "ListItem",

@@ -1,7 +1,8 @@
 +++
 title = "Causality and knowledge"
 description = "In an agent-driven project, causality follows the dependency graph and knowledge follows file paths and glossary tags. Both arrive in one packet."
-date = 2026-09-15T23:00:00+03:00
+datePublished = 2026-09-15T23:00:00+03:00
+dateModified = 2026-09-15T23:32:36+03:00
 tags = ["ai", "graphtheory", "programming"]
 +++
 
