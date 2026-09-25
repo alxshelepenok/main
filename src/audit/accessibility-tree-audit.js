@@ -378,15 +378,6 @@
       }
     }
 
-    if (isLandmark(el) && el.getAttribute("tabindex") === null) {
-      issues = issues.concat(
-        warn(
-          "landmark <" + tag + "> has no tabindex; add tabindex=\"-1\" so the agent can " +
-            "move focus here when navigating to #" + anchor
-        )
-      );
-    }
-
     if (container) {
       Array.prototype.slice
         .call(el.querySelectorAll(INTERACTIVE_SELECTOR))

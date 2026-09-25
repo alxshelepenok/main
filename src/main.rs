@@ -1316,7 +1316,7 @@ mod tests {
         );
         let html = TEMPLATES.render("index.hbs", &ctx).unwrap();
 
-        assert!(html.contains(r#"<section class="content" id="person" tabindex="-1" aria-labelledby="person-title">"#));
+        assert!(html.contains(r#"<section class="content" id="person" aria-labelledby="person-title">"#));
         assert!(html.contains(r#"<h1 id="person-title">"#));
         assert!(html.contains(r#"<h2 id="links-title">Connections</h2>"#));
         assert!(html.contains(r#"<ul id="links-list" aria-labelledby="links-title">"#));
@@ -1348,7 +1348,7 @@ mod tests {
         ctx.insert("article_toc", &[serde_json::json!({ "level": 2, "text": "Intro", "id": "intro" })]);
         let html = TEMPLATES.render("article.hbs", &ctx).unwrap();
 
-        assert!(html.contains(r#"<article class="article" id="article" tabindex="-1" aria-labelledby="article-title">"#));
+        assert!(html.contains(r#"<article class="article" id="article" aria-labelledby="article-title">"#));
         assert!(html.contains(r#"<h1 id="article-title">Title</h1>"#));
         assert!(html.contains(r#"aria-labelledby="toc-title""#));
         assert!(html.contains(r#"<h2 id="toc-title">On this page</h2>"#));

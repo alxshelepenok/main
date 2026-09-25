@@ -129,7 +129,7 @@ pub fn home_graph(content: &Value, recent_articles: &[Article]) -> Value {
                 .enumerate()
                 .map(|(i, l)| {
                     let title = l["title"].as_str().unwrap_or("");
-                    let anchor = format!("link-{}", title.to_lowercase());
+                    let anchor = format!("link-{}", slug::slugify(title));
                     json!({
                         "@type": "ListItem",
                         "position": i + 1,

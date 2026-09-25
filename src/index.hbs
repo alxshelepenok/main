@@ -2,13 +2,13 @@
 
 {% block content %}
 <main id="page" tabindex="-1">
-  <section class="content" id="person" tabindex="-1" aria-labelledby="person-title">
+  <section class="content" id="person" aria-labelledby="person-title">
     <hgroup>
       <h1 id="person-title">{{ name }}</h1>
       <p>{{ note }}</p>
     </hgroup>
     {% if recent_articles %}
-    <section class="links" id="blog" tabindex="-1" aria-labelledby="blog-title">
+    <section class="links" id="blog" aria-labelledby="blog-title">
       <h2 id="blog-title">{{ labels.recent }}</h2>
       <ul id="blog-articles" aria-labelledby="blog-title">
         {%- for article in recent_articles %}
@@ -21,11 +21,11 @@
       <a href="{{ blog_href }}">All articles</a>
     </section>
     {% endif %}
-    <section class="links" id="links" tabindex="-1" aria-labelledby="links-title">
+    <section class="links" id="links" aria-labelledby="links-title">
       <h2 id="links-title">{{ labels.links }}</h2>
       <ul id="links-list" aria-labelledby="links-title">
         {%- for link in links %}
-        <li><a target="_blank" rel="noopener noreferrer" href="{{ link.href }}" id="link-{{ link.title | lower }}">{{ link.title | spaceless }}</a></li>
+        <li><a target="_blank" rel="noopener noreferrer" href="{{ link.href }}" id="link-{{ link.title | slugify }}">{{ link.title | spaceless }}</a></li>
         {% endfor -%}
       </ul>
     </section>

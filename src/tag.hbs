@@ -6,7 +6,7 @@
 <main id="page" tabindex="-1">
   <section class="listing" aria-labelledby="tag-title">
     <header class="listing-header">
-      <nav class="breadcrumbs" id="breadcrumb" aria-label="Breadcrumb" tabindex="-1">
+      <nav class="breadcrumbs" id="breadcrumb" aria-label="Breadcrumb">
         <ol>
           <li><a href="{{ home_href }}">{{ labels.home }}</a></li>
           <li><a href="{{ blog_href }}">{{ labels.blog }}</a></li>
@@ -22,7 +22,7 @@
     <ul id="articles" aria-labelledby="tag-title">
       {%- for card in cards %}
       <li>
-        <article class="card" id="article-{{ card.slug }}" tabindex="-1">
+        <article class="card" id="article-{{ card.slug }}">
           <h2><a href="{{ card.href }}">{{ card.title }}</a></h2>
           <p class="card-description">{{ card.description }}</p>
           <div class="article-meta">

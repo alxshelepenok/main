@@ -4,9 +4,9 @@
 <header class="header"><a href="{{ home_href }}">{{ name }}</a></header>
 <main id="page" tabindex="-1">
   <div class="article-layout">
-    <article class="article" id="article" tabindex="-1" aria-labelledby="article-title">
+    <article class="article" id="article" aria-labelledby="article-title">
       <header class="article-header">
-        <nav class="breadcrumbs" id="breadcrumb" aria-label="Breadcrumb" tabindex="-1">
+        <nav class="breadcrumbs" id="breadcrumb" aria-label="Breadcrumb">
           <ol>
             <li><a href="{{ home_href }}">{{ labels.home }}</a></li>
             <li><a href="{{ blog_href }}">{{ labels.blog }}</a></li>
@@ -29,7 +29,7 @@
       {{ article_content }}
     </article>
     {% if article_toc %}
-    <nav class="article-toc" id="toc" aria-labelledby="toc-title" tabindex="-1">
+    <nav class="article-toc" id="toc" aria-labelledby="toc-title">
       <h2 id="toc-title">{{ labels.toc }}</h2>
       <ul id="toc-list" aria-label="{{ labels.toc_list }}">
         {% for item in article_toc %}

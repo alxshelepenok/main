@@ -8,6 +8,7 @@ edition = "2021"
 
 [dependencies]
 tera = "1.19.0"
+slug = "0.1"
 serde_json = { version = "1.0.96", features = ["preserve_order"] }
 comrak = "0.54"
 toml = "0.8"

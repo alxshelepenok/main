@@ -104,6 +104,11 @@ a:hover {
   text-decoration: none;
 }
 
+a:focus {
+  outline: none;
+  text-decoration: underline;
+}
+
 h1,
 h2 {
   font-weight: 600;
@@ -132,8 +137,7 @@ main {
 }
 
 section:focus,
-article:focus,
-article:focus-visible {
+article:focus {
   outline: 0;
 }
 
@@ -156,8 +160,7 @@ pre::-webkit-scrollbar-thumb {
   scroll-margin-top: 999px;
 }
 
-#page:focus,
-#page:focus-visible {
+#page:focus {
   outline: 0;
 }
 
@@ -178,16 +181,14 @@ pre::-webkit-scrollbar-thumb {
   top: 1rem;
   left: 1rem;
   z-index: 100;
-  padding: 0.5rem 0.75rem;
   background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
   transform: translateY(-300%);
 }
 
 .skip-link:focus {
-  transform: none;
   outline: 0;
+  transform: none;
+  text-decoration: underline;
 }
 
 .skip-link:hover {
@@ -261,8 +262,13 @@ pre::-webkit-scrollbar-thumb {
   font-size: var(--font-size-lg);
 }
 
-.links a:hover {
+.links a:hover,
+.links a:focus {
   text-decoration: underline;
+}
+
+.links a:focus {
+  outline: none;
 }
 
 .links > h2 {
@@ -309,8 +315,13 @@ pre::-webkit-scrollbar-thumb {
   text-decoration: none;
 }
 
-.breadcrumbs a:hover {
+.breadcrumbs a:hover,
+.breadcrumbs a:focus {
   text-decoration: underline;
+}
+
+.breadcrumbs a:focus {
+  outline: 0;
 }
 
 .breadcrumbs ol {
@@ -431,9 +442,14 @@ pre::-webkit-scrollbar-thumb {
   transition: opacity 0.15s ease-in;
 }
 
-.article-toc a:hover {
+.article-toc a:hover,
+.article-toc a:focus {
   color: hsl(var(--color-accent));
   text-decoration: underline;
+}
+
+.article-toc a:focus {
+  outline: 0;
 }
 
 .article-toc a.active,
@@ -482,6 +498,8 @@ pre::-webkit-scrollbar-thumb {
   transition: opacity 0.15s ease-in;
 }
 
+.article > h2:focus .anchor::before,
+.article > h3:focus .anchor::before,
 .article > h2:hover .anchor::before,
 .article > h3:hover .anchor::before {
   opacity: 0.7;
@@ -617,6 +635,12 @@ pre::-webkit-scrollbar-thumb {
   color: var(--color-foreground);
 }
 
+.tabs summary:focus {
+  outline-width: 1px;
+  outline-style: solid;
+  outline-color: var(--color-border);
+}
+
 .tabs details[open] > summary {
   z-index: 1;
   position: relative;
@@ -723,6 +747,11 @@ a.article-tag:hover {
   text-decoration: underline;
 }
 
+a.article-tag:focus {
+  outline: 0;
+  text-decoration: underline;
+}
+
 .tag-chip {
   display: flex;
   justify-content: space-between;
@@ -757,9 +786,13 @@ a.article-tag:hover {
   text-decoration: none;
 }
 
-.footer a:hover {
-  color: var(--color-foreground);
+.footer a:hover,
+.footer a:focus {
   text-decoration: underline;
+}
+
+.footer a:focus {
+  outline: none;
 }
 
 .footer nav {
